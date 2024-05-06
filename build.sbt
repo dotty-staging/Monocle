@@ -44,7 +44,7 @@ lazy val buildSettings = Seq(
   Compile / console / scalacOptions -= "-Ywarn-unused:imports",
   scalacOptions ++= {
     if (isScala3.value)
-      Seq("-source:3.0-migration", "-Ykind-projector", "-language:implicitConversions,higherKinds,postfixOps")
+      Seq("-source:3.0-migration", "-Ykind-projector", "-language:implicitConversions,postfixOps")
     else
       Seq(
         "-Ymacro-annotations",
