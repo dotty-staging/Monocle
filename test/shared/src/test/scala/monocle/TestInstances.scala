@@ -90,7 +90,7 @@ trait TestInstances extends PlatformSpecificTestInstances with cats.instances.Al
         scheme   <- idGen
         ssp      <- idGen
         fragment <- Gen.option(idGen)
-      } yield new URI(scheme, ssp, fragment.orNull)
+      } yield new URI(scheme, ssp, fragment.orNull[String | Null])
     }
 
   implicit def uriCoGen: Cogen[URI] =
