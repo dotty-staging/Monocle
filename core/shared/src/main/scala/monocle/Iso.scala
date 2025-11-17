@@ -222,8 +222,8 @@ object PIso extends IsoInstances {
     */
   def id[S, T]: PIso[S, T, S, T] =
     new PIso[S, T, S, T] { self =>
-      def get(s: S): S        = s
-      def reverseGet(t: T): T = t
+      def get(s: S): S              = s
+      def reverseGet(t: T): T       = t
       def reverse: PIso[T, S, T, S] =
         new PIso[T, S, T, S] {
           def get(t: T): T              = t
@@ -360,4 +360,8 @@ final case class IsoSyntax[S, A](private val self: Iso[S, A]) extends AnyVal {
 
   def at[I, A1](i: I)(implicit evAt: At[A, I, A1]): Lens[S, A1] =
     self.andThen(evAt.at(i))
+
+  @deprecated("Preserved for bincompat", "3.1.0")
+  def index[I, A1](i: I, evIndex: Index[A, I, A1]): Optional[S, A1] =
+    self.index(i)(evIndex, implicitly, implicitly)
 }

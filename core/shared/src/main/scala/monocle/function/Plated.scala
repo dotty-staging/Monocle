@@ -5,8 +5,6 @@ import monocle.{Setter, Traversal}
 import scala.annotation.implicitNotFound
 import cats.{Applicative, Monad, Traverse}
 import cats.data.State
-import cats.instances.int._
-import cats.instances.lazyList._
 import cats.syntax.flatMap._
 
 /** [[Plated]] is a type-class for types which can extract their immediate self-similar children.
@@ -42,10 +40,7 @@ trait PlatedFunctions extends CommonPlatedFunctions {
     * an infinite loop if there is no fixpoint)
     */
   def rewriteOf[A](l: Setter[A, A])(f: A => Option[A])(a: A): A = {
-    def go(b: A): A = {
-      val c = transformOf(l)(go)(b)
-      f(c).fold(c)(go)
-    }
+    def go: A => A = transformOf(l)(x => f(x).map(go).getOrElse(x))
     go(a)
   }
 
@@ -54,8 +49,10 @@ trait PlatedFunctions extends CommonPlatedFunctions {
     transformOf(plate[A].asSetter)(f)(a)
 
   /** transform every element by applying a [[Setter]] */
-  def transformOf[A](l: Setter[A, A])(f: A => A)(a: A): A =
-    l.modify(b => transformOf(l)(f)(f(b)))(a)
+  def transformOf[A](l: Setter[A, A])(f: A => A)(a: A): A = {
+    def go: A => A = l.modify(x => go(x)).andThen(f)
+    go(a)
+  }
 
   /** transforming counting changes */
   def transformCounting[A: Plated](f: A => Option[A])(a: A): (Int, A) =
@@ -67,7 +64,7 @@ trait PlatedFunctions extends CommonPlatedFunctions {
 
   /** transforming every element using monadic transformation */
   def transformM[A: Plated, M[_]: Monad](f: A => M[A])(a: A): M[A] = {
-    val l = plate[A]
+    val l              = plate[A]
     def go(c: A): M[A] =
       l.modifyA[M](b => f(b).flatMap(go))(c)
     go(a)

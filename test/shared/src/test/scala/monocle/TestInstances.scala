@@ -1,7 +1,6 @@
 package monocle
 
 import java.net.URI
-import java.util.UUID
 
 import org.scalacheck.Arbitrary._
 import org.scalacheck.rng.Seed
@@ -64,7 +63,7 @@ trait TestInstances extends PlatformSpecificTestInstances with cats.instances.Al
     Arbitrary(Arbitrary.arbitrary[List[A]].map(_.toVector))
 
   implicit def listMapArbitrary[K: Arbitrary, V: Arbitrary]: Arbitrary[ListMap[K, V]] =
-    Arbitrary(Arbitrary.arbitrary[List[(K, V)]].map(l => ListMap(l: _*)))
+    Arbitrary(Arbitrary.arbitrary[List[(K, V)]].map(l => ListMap(l*)))
 
   implicit def mapArbitrary[K: Arbitrary, V: Arbitrary]: Arbitrary[Map[K, V]] =
     Arbitrary(Arbitrary.arbitrary[List[(K, V)]].map(_.toMap))
@@ -77,11 +76,6 @@ trait TestInstances extends PlatformSpecificTestInstances with cats.instances.Al
       Cogen[(A, Option[Cofree[Option, A]])]
         .perturb(seed, (t.head, t.tail.value))
     )
-
-  implicit def uuidArbitrary: Arbitrary[UUID] = Arbitrary(UUID.randomUUID)
-
-  implicit def uuidCoGen: Cogen[UUID] =
-    Cogen[(Long, Long)].contramap[UUID]((u: UUID) => (u.getMostSignificantBits, u.getLeastSignificantBits))
 
   implicit def uriArbitrary: Arbitrary[URI] =
     Arbitrary {
@@ -96,12 +90,12 @@ trait TestInstances extends PlatformSpecificTestInstances with cats.instances.Al
   implicit def uriCoGen: Cogen[URI] =
     Cogen[String].contramap[URI](_.toString)
 
-  implicit val nullaryGen: Arbitrary[Nullary] = Arbitrary(Gen.const(Nullary()))
-  implicit val unaryGen: Arbitrary[Unary]     = Arbitrary(arbitrary[Int].map(Unary.apply))
-  implicit val binaryGen: Arbitrary[Binary]   = Arbitrary(arbitrary[(String, Int)].map((Binary.apply _) tupled))
+  implicit val nullaryGen: Arbitrary[Nullary]   = Arbitrary(Gen.const(Nullary()))
+  implicit val unaryGen: Arbitrary[Unary]       = Arbitrary(arbitrary[Int].map(Unary.apply))
+  implicit val binaryGen: Arbitrary[Binary]     = Arbitrary(arbitrary[(String, Int)].map(Binary.apply.tupled))
   implicit val quintaryGen: Arbitrary[Quintary] = Arbitrary(
     arbitrary[(Char, Boolean, String, Int, Double)]
-      .map((Quintary.apply _) tupled)
+      .map(Quintary.apply.tupled)
   )
   implicit val aritiesGen: Arbitrary[Arities] =
     Arbitrary(

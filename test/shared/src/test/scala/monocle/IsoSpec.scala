@@ -13,11 +13,11 @@ class IsoSpec extends MonocleSuite {
   val _nullary: Iso[Nullary, Unit] = Iso[Nullary, Unit](n => ()) { case () =>
     Nullary()
   }
-  val _unary: Iso[Unary, Int] = Iso[Unary, Int](_.i)(Unary.apply)
+  val _unary: Iso[Unary, Int]             = Iso[Unary, Int](_.i)(Unary.apply)
   val _binary: Iso[Binary, (String, Int)] =
-    Iso[Binary, (String, Int)](b => (b.s, b.i))((Binary.apply _).tupled)
+    Iso[Binary, (String, Int)](b => (b.s, b.i))(Binary.apply.tupled)
   val _quintary: Iso[Quintary, (Char, Boolean, String, Int, Double)] =
-    Iso[Quintary, (Char, Boolean, String, Int, Double)](b => (b.c, b.b, b.s, b.i, b.f))((Quintary.apply _).tupled)
+    Iso[Quintary, (Char, Boolean, String, Int, Double)](b => (b.c, b.b, b.s, b.i, b.f))(Quintary.apply.tupled)
 
   case class IntWrapper(i: Int)
   implicit val intWrapperGen: Arbitrary[IntWrapper] = Arbitrary(arbitrary[Int].map(IntWrapper.apply))
@@ -37,7 +37,7 @@ class IsoSpec extends MonocleSuite {
     Arbitrary(Gen.const(EmptyCaseType()))
   implicit def emptyCaseTypeEq[A]: Eq[EmptyCaseType[A]] = Eq.fromUniversalEquals[EmptyCaseType[A]]
 
-  val iso = Iso[IntWrapper, Int](_.i)(IntWrapper.apply)
+  val iso                  = Iso[IntWrapper, Int](_.i)(IntWrapper.apply)
   val involutedListReverse =
     Iso.involuted[List[Int]](_.reverse) // ∀ {T} -> List(ts: T*).reverse.reverse == List(ts: T*)
   val involutedTwoMinusN = Iso.involuted[Int](2 - _) //  ∀ {n : Int} -> n == 2 - (2 - n)
@@ -87,12 +87,12 @@ class IsoSpec extends MonocleSuite {
     // format: off
 assertEquals(    (Nullary() match { case _nullary(unit) => unit }) ,  (()))
     // format: on
-    assertEquals((Unary(3) match { case _unary(value) => value * 2 }), 6)
-    assertEquals((Binary("foo", 7) match { case _binary(s, i) => s + i }), "foo7")
+    assertEquals(Unary(3) match { case _unary(value) => value * 2 }, 6)
+    assertEquals(Binary("foo", 7) match { case _binary(s, i) => s + i }, "foo7")
     assertEquals(
-      (Quintary('x', true, "bar", 13, 0.4) match {
+      Quintary('x', true, "bar", 13, 0.4) match {
         case _quintary(c, b, s, i, f) => "" + c + b + s + i + f
-      }),
+      },
       "xtruebar130.4"
     )
   }

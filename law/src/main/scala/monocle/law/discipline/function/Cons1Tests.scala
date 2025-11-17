@@ -7,20 +7,19 @@ import org.scalacheck.Arbitrary
 import org.typelevel.discipline.Laws
 
 import cats.Eq
-import cats.instances.tuple._
 
 @deprecated("no replacement", since = "3.0.0-M1")
 object Cons1Tests extends Laws {
   def apply[S: Eq: Arbitrary, H: Eq: Arbitrary, T: Eq: Arbitrary](implicit
     evCons1: Cons1[S, H, T],
-    arbHTHT: Arbitrary[((H, T)) => ((H, T))],
+    arbHTHT: Arbitrary[((H, T)) => (H, T)],
     arbHH: Arbitrary[H => H],
     arbTT: Arbitrary[T => T]
   ): RuleSet =
     new SimpleRuleSet(
       "Cons1",
-      IsoTests(cons1[S, H, T]).props ++
+      (IsoTests(cons1[S, H, T]).props ++
         LensTests(head[S, H, T]).props ++
-        LensTests(tail[S, H, T]).props: _*
+        LensTests(tail[S, H, T]).props)*
     )
 }

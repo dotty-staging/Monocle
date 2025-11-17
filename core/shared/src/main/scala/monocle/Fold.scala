@@ -2,8 +2,6 @@ package monocle
 
 import cats.{Foldable, Monoid}
 import cats.arrow.Choice
-import cats.instances.int._
-import cats.instances.list._
 import cats.syntax.either._
 import monocle.function.{At, Each, FilterIndex, Index}
 import monocle.internal.Monoids
@@ -167,6 +165,10 @@ final case class FoldSyntax[S, A](private val self: Fold[S, A]) extends AnyVal {
 
   def at[I, A1](i: I)(implicit evAt: At[A, I, A1]): Fold[S, A1] =
     self.andThen(evAt.at(i))
+
+  @deprecated("Preserved for bincompat", "3.1.0")
+  def index[I, A1](i: I, evIndex: Index[A, I, A1]): Fold[S, A1] =
+    self.index(i)(evIndex)
 
   /** compose a [[Fold]] with a [[Fold]] */
   @deprecated("use andThen", since = "3.0.0-M1")

@@ -6,7 +6,6 @@ import scala.annotation.implicitNotFound
 import scala.collection.immutable.SortedMap
 import cats.syntax.traverse._
 import cats.{Applicative, Order, Traverse}
-import cats.instances.lazyList._
 
 /** Typeclass that defines a [[Traversal]] from an `S` to all its elements `A` whose index `I` in `S` satisfies the
   * predicate
@@ -54,8 +53,6 @@ object FilterIndex extends FilterIndexFunctions {
   /** Std instances */
   /** *********************************************************************************************
     */
-  import cats.instances.list._
-  import cats.instances.vector._
 
   implicit def listFilterIndex[A]: FilterIndex[List[A], Int, A] =
     fromTraverse(_.zipWithIndex)
@@ -91,7 +88,7 @@ object FilterIndex extends FilterIndexFunctions {
               .traverse { case (k, v) =>
                 (if (predicate(k)) f(v) else v.pure[F]).tupleLeft(k)
               }
-              .map(kvs => SortedMap(kvs: _*)(ok.toOrdering))
+              .map(kvs => SortedMap(kvs*)(using ok.toOrdering))
         }
     }
 

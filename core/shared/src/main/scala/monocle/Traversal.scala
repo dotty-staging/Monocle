@@ -5,7 +5,6 @@ import cats.arrow.Choice
 import cats.data.Const
 import cats.syntax.either._
 import monocle.function.{At, Each, FilterIndex, Index}
-import cats.catsInstancesForId
 import cats.syntax.traverse._
 
 /** A [[PTraversal]] can be seen as a [[POptional]] generalised to 0 to n targets where n can be infinite.
@@ -308,4 +307,8 @@ final case class TraversalSyntax[S, A](private val self: Traversal[S, A]) extend
 
   def at[I, A1](i: I)(implicit evAt: At[A, I, A1]): Traversal[S, A1] =
     self.andThen(evAt.at(i))
+
+  @deprecated("Preserved for bincompat", "3.1.0")
+  def index[I, A1](i: I, evIndex: Index[A, I, A1]): Traversal[S, A1] =
+    self.index(i)(evIndex, implicitly, implicitly)
 }

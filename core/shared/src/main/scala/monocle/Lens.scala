@@ -7,7 +7,7 @@ import monocle.function.{At, Each, FilterIndex, Index}
 
 /** A [[PLens]] can be seen as a pair of functions:
   *   - `get: S => A` i.e. from an `S`, we can extract an `A`
-  *   - `set: (B, S) => T` i.e. if we replace an `A` by a `B` in an `S`, we obtain a `T`
+  *   - `replace: (B, S) => T` i.e. if we replace an `A` by a `B` in an `S`, we obtain a `T`
   *
   * A [[PLens]] could also be defined as a weaker [[PIso]] where replace requires an additional parameter than
   * reverseGet.
@@ -308,4 +308,8 @@ final case class LensSyntax[S, A](private val self: Lens[S, A]) extends AnyVal {
 
   def at[I, A1](i: I)(implicit evAt: At[A, I, A1]): Lens[S, A1] =
     self.andThen(evAt.at(i))
+
+  @deprecated("Preserved for bincompat", "3.1.0")
+  def index[I, A1](i: I, evIndex: Index[A, I, A1]): Optional[S, A1] =
+    self.index(i)(evIndex, implicitly, implicitly)
 }
